@@ -40,9 +40,9 @@ router.get(
     studentGroupController.getGroupMembers
 );
 
-// GET /api/students/:studentId/group - Get the group of a specific student
+// GET /api/student-groups/:studentId/group - Get the group of a specific student
 router.get(
-    '/students/:studentId/group',
+    '/student-groups/:studentId/group',
     protect,
     authorize('AdminApp', 'AdminInstitucion', 'Profesor', 'AdminDistrito', 'AdminMinisterio'), // Scope check inside controller
     studentGroupController.getStudentGroup

@@ -417,7 +417,7 @@ exports.getGroupMembers = async (req, res, next) => {
     }
 };
 
-// --- NEW: GET STUDENT'S GROUP (GET /api/students/:studentId/group) ---
+// --- NEW: GET STUDENT'S GROUP (GET /api/student-groups/:studentId/group) ---
 exports.getStudentGroup = async (req, res, next) => {
     const { studentId } = req.params;
     const user = req.user;
