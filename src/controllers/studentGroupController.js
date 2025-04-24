@@ -416,3 +416,47 @@ exports.getGroupMembers = async (req, res, next) => {
         next(error);
     }
 };
+
+// --- NEW: GET STUDENT'S GROUP (GET /api/students/:studentId/group) ---
+exports.getStudentGroup = async (req, res, next) => {
+    const { studentId } = req.params;
+    const user = req.user;
+
+    try {
+        // 1. Validate numeric studentId
+        const numericStudentId = parseInt(studentId, 10);
+        if (isNaN(numericStudentId)) {
+            return res.status(400).json({ message: 'El studentId debe ser un número válido.' });
+        }
+
+        // 2. Fetch the group the student belongs to
+        const query = `
+            SELECT 
+                sg.GroupID, sg.GroupName, sg.AcademicYear, sg.Description, sg.IsActive, sg.CreatedAt, sg.UpdatedAt
+            FROM StudentGroupMembers sgm
+            JOIN StudentGroups sg ON sgm.GroupID = sg.GroupID
+            WHERE sgm.StudentID = ?
+        `;
+        const [groups] = await db.query(query, [numericStudentId]);
+
+        if (groups.length === 0) {
+            return res.status(404).json({ message: 'El estudiante no pertenece a ningún grupo.' });
+        }
+
+        // 3. Authorization (Only users with access to the group can view it)
+        const authorized = await checkGroupScope(groups[0].GroupID, user);
+        if (!authorized) {
+            return res.status(403).json({ message: 'No tiene permiso para ver el grupo de este estudiante.' });
+        }
+
+        // 4. Success Response
+        res.status(200).json({
+            message: 'Grupo del estudiante obtenido exitosamente.',
+            group: groups[0]
+        });
+
+    } catch (error) {
+        console.error(`Error al obtener el grupo del estudiante ${studentId}:`, error);
+        next(error);
+    }
+};
