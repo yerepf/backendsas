@@ -95,15 +95,15 @@ exports.getTemplateByStudent = async (req, res, next) => {
             return res.status(404).json({ message: 'No se encontró plantilla biométrica para este estudiante' });
         }
 
-        // No enviar el TemplateData completo por seguridad (dependiendo de tu caso de uso)
+        // Incluir TemplateData en la respuesta
         const response = {
             templateId: template[0].TemplateID,
             studentId: template[0].StudentID,
+            templateData: template[0].TemplateData,
             fingerIndex: template[0].FingerIndex,
             enrollmentDate: template[0].EnrollmentDate,
             enrolledByUserId: template[0].EnrolledByUserID,
-            isActive: template[0].IsActive,
-            hasTemplate: template[0].TemplateData !== null
+            isActive: template[0].IsActive
         };
 
         res.status(200).json(response);
