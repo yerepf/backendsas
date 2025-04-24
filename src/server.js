@@ -34,6 +34,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const roleRoutes = require('./routes/roleRoutes');
 const attendanceRoutes = require('./routes/attendanceRecordsRoutes'); // Nueva ruta para asistencia
 const excuseRoutes = require('./routes/excuseRoutes'); // Nueva ruta para excusas
+ const biometricRoutes = require('./routes/fingerprintRoutes');
 
 // ... importar otras rutas (attendance, excuses, etc.)
 
@@ -46,6 +47,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/roles', roleRoutes);       
 app.use('/api/attendances', attendanceRoutes);
 app.use('/api/excuses', excuseRoutes);
+app.use('/api/biometrics', biometricRoutes);
 
 // ... usar otras rutas
 
