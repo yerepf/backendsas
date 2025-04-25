@@ -65,29 +65,10 @@ exports.createOrUpdateTemplate = async (req, res, next) => {
 exports.getTemplateByStudent = async (req, res, next) => {
     try {
         const { studentId } = req.params;
-        const userId = req.user.userId;
-        const roleName = req.user.roleName;
-        const institutionId = req.user.institutionId;
-
-        // Verificar que el estudiante pertenece a la institución del usuario (excepto AdminApp)
-        if (roleName !== 'AdminApp') {
-            const [student] = await db.query(
-                'SELECT InstitutionID FROM Students WHERE StudentID = ?',
-                [studentId]
-            );
-
-            if (student.length === 0) {
-                return res.status(404).json({ message: 'Estudiante no encontrado' });
-            }
-
-            if (student[0].InstitutionID !== institutionId) {
-                return res.status(403).json({ message: 'No tiene permiso para ver huellas de este estudiante' });
-            }
-        }
 
         // Obtener la plantilla biométrica
         const [template] = await db.query(
-            'SELECT TemplateID, StudentID, TemplateData, FingerIndex, EnrollmentDate, EnrolledByUserID, IsActive FROM BiometricTemplates WHERE StudentID = ?',
+            'SELECT TemplateData FROM BiometricTemplates WHERE StudentID = ?',
             [studentId]
         );
 
@@ -98,18 +79,8 @@ exports.getTemplateByStudent = async (req, res, next) => {
         // Convertir TemplateData de Buffer a string (si es necesario)
         const templateData = template[0].TemplateData.toString('utf8');
 
-        // Incluir TemplateData en la respuesta
-        const response = {
-            templateId: template[0].TemplateID,
-            studentId: template[0].StudentID,
-            templateData: templateData,
-            fingerIndex: template[0].FingerIndex,
-            enrollmentDate: template[0].EnrollmentDate,
-            enrolledByUserId: template[0].EnrolledByUserID,
-            isActive: template[0].IsActive
-        };
-
-        res.status(200).json(response);
+        // Responder solo con el templateData
+        res.status(200).json({ templateData });
 
     } catch (error) {
         console.error('Error al obtener plantilla biométrica:', error);
