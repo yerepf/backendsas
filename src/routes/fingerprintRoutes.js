@@ -29,9 +29,9 @@ router.delete(
 );
 
 
-// GET /api/biometrics/template/:templateData - Obtener ID de estudiante por datos de huella
+// GET /api/biometrics/template - Obtener ID de estudiante por datos de huella
 router.get(
-    '/template/:templateData',
+    '/template',
     protect,
     authorize('AdminInstitucion', 'Profesor', 'PersonalApoyo'), // Profesor también puede ver para asistencia
     biometricController.getStudentByTemplate
