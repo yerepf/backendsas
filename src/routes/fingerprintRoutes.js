@@ -16,7 +16,7 @@ router.post(
 router.get(
     '/student/:studentId',
     protect,
-    authorize('AdminInstitucion', 'Profesor'), // Profesor también puede ver para asistencia
+    authorize('AdminInstitucion', 'Profesor', 'PersonalApoyo'), // Profesor también puede ver para asistencia
     biometricController.getTemplateByStudent
 );
 
@@ -27,5 +27,15 @@ router.delete(
     authorize('AdminInstitucion'),
     biometricController.deleteTemplate
 );
+
+
+// GET /api/biometrics/template/:templateData - Obtener ID de estudiante por datos de huella
+router.get(
+    '/template/:templateData',
+    protect,
+    authorize('AdminInstitucion', 'Profesor', 'PersonalApoyo'), // Profesor también puede ver para asistencia
+    biometricController.getStudentIdByTemplateData
+);
+
 
 module.exports = router;

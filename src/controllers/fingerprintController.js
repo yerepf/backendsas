@@ -152,3 +152,48 @@ exports.deleteTemplate = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+exports.getStudentByTemplate = async (req, res, next) => {
+    try {
+        const { templateData } = req.body;
+
+        // Validar que se envió el templateData
+        if (!templateData) {
+            return res.status(400).json({ message: 'templateData es requerido' });
+        }
+
+        // Buscar el estudiante asociado a la plantilla biométrica
+        const [template] = await db.query(
+            'SELECT b.TemplateID, b.StudentID, s.FirstName, s.LastName, s.InstitutionID, b.FingerIndex, b.EnrollmentDate, b.EnrolledByUserID, b.IsActive ' +
+            'FROM BiometricTemplates b ' +
+            'JOIN Students s ON b.StudentID = s.StudentID ' +
+            'WHERE b.TemplateData = ?',
+            [templateData]
+        );
+
+        if (template.length === 0) {
+            return res.status(404).json({ message: 'No se encontró estudiante asociado a la plantilla biométrica' });
+        }
+
+        // Construir la respuesta con los datos del estudiante y la plantilla
+        const response = {
+            templateId: template[0].TemplateID,
+            studentId: template[0].StudentID,
+            firstName: template[0].FirstName,
+            lastName: template[0].LastName,
+            institutionId: template[0].InstitutionID,
+            fingerIndex: template[0].FingerIndex,
+            enrollmentDate: template[0].EnrollmentDate,
+            enrolledByUserId: template[0].EnrolledByUserID,
+            isActive: template[0].IsActive
+        };
+
+        res.status(200).json(response);
+
+    } catch (error) {
+        console.error('Error al obtener estudiante por plantilla biométrica:', error);
+        next(error);
+    }
+};
