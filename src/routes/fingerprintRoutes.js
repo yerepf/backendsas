@@ -34,7 +34,7 @@ router.get(
     '/template/:templateData',
     protect,
     authorize('AdminInstitucion', 'Profesor', 'PersonalApoyo'), // Profesor también puede ver para asistencia
-    biometricController.getStudentIdByTemplateData
+    biometricController.getStudentByTemplate
 );
 
 
