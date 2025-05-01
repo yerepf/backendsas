@@ -206,19 +206,23 @@ exports.getAllUsers = async (req, res, next) => {
         const creator = req.user; // Usuario que realiza la acción (obtenido del middleware protect)
         let query = `
             SELECT 
-                u.UserID AS userId,
-                u.Username AS username,
-                u.FirstName AS firstName,
-                u.LastName AS lastName,
-                u.Email AS email,
-                u.RoleID AS roleId,
-                r.RoleName AS roleName,
-                u.InstitutionID AS institutionId,
-                u.DistrictID AS districtId,
-                u.IsMinistryUser AS isMinistryUser,
-                u.IsActive AS isActive
+            u.UserID AS userId,
+            u.Username AS username,
+            u.FirstName AS firstName,
+            u.LastName AS lastName,
+            u.Email AS email,
+            u.RoleID AS roleId,
+            r.RoleName AS roleName,
+            u.InstitutionID AS institutionId,
+            i.InstitutionName AS institutionName,
+            u.DistrictID AS districtId,
+            d.DistrictName AS districtName,
+            u.IsMinistryUser AS isMinistryUser,
+            u.IsActive AS isActive
             FROM Users u
             LEFT JOIN Roles r ON u.RoleID = r.RoleID
+            LEFT JOIN Institutions i ON u.InstitutionID = i.InstitutionID
+            LEFT JOIN Districts d ON u.DistrictID = d.DistrictID
         `;
         let queryParams = [];
 
