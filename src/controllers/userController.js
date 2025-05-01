@@ -214,7 +214,7 @@ exports.getAllUsers = async (req, res, next) => {
             u.RoleID AS roleId,
             r.RoleName AS roleName,
             u.InstitutionID AS institutionId,
-            i.InstitutionName AS institutionName,
+            i.Name AS institutionName,
             u.DistrictID AS districtId,
             d.DistrictName AS districtName,
             u.IsMinistryUser AS isMinistryUser,
