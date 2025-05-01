@@ -102,14 +102,12 @@ exports.getAllInstitutions = async (req, res, next) => {
         `;
         const queryParams = [];
 
-        // Filter by District if user is AdminDistrito
+        // Authorization Check
         if (user.roleName === 'AdminDistrito' && user.districtId) {
             query += ' WHERE i.DistrictID = ?';
             queryParams.push(user.districtId);
-        }
-
-        // AdminApp puede ver todas las instituciones
-        if (user.roleName === 'AdminApp') {
+        } else if (user.roleName === 'AdminApp' || user.roleName === 'AdminMinisterio') {
+            // AdminApp and AdminMinisterio can view all institutions
             query = `
                 SELECT 
                     i.InstitutionID, 
@@ -120,6 +118,9 @@ exports.getAllInstitutions = async (req, res, next) => {
                 FROM Institutions i
                 JOIN Districts d ON i.DistrictID = d.DistrictID
             `;
+        } else {
+            // Other roles are not authorized
+            return res.status(403).json({ message: 'Acceso prohibido: No tiene los permisos necesarios para realizar esta acción.' });
         }
 
         query += ' ORDER BY i.Name ASC';
