@@ -271,3 +271,59 @@ exports.updateStudent = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getStudentsWithGroups = async (req, res, next) => {
+    const user = req.user;
+    // Considerar añadir paginación/filtros similar a getAllStudentGroups si es necesario
+    // const { page = 1, limit = 20, sortBy = 'LastName', sortOrder = 'ASC' } = req.query;
+
+    try {
+        // 1. Autorización (Similar a getAllStudents, ajustar roles si es necesario)
+        let queryConditions = '';
+        const queryParams = [];
+
+        if (user.isMinistryUser) {
+            // Ministerio puede ver todos los estudiantes y sus grupos
+        } else if (user.roleName === 'AdminDistrito' && user.districtId) {
+            // Admin de Distrito ve estudiantes de su distrito
+            queryConditions = `WHERE i.DistrictID = ?`;
+            queryParams.push(user.districtId);
+        } else if ((user.roleName === 'AdminInstitucion' || user.roleName === 'Profesor') && user.institutionId) {
+            // Admin de Institución y Profesor ven estudiantes de su institución
+            queryConditions = `WHERE s.InstitutionID = ?`;
+            queryParams.push(user.institutionId);
+        } else {
+            // Otros roles sin acceso general
+            return res.status(403).json({ message: 'No tiene permiso para ver esta información.' });
+        }
+
+        // 2. Obtener estudiantes y datos de sus grupos usando JOINs
+        // LEFT JOIN asegura que los estudiantes sin grupo también se incluyan
+        const query = `
+            SELECT
+                s.StudentID, s.InstitutionID, s.StudentUniqueID, s.FirstName, s.LastName, s.Gender, s.DateOfBirth, s.Status, s.CreatedAt AS StudentCreatedAt, s.UpdatedAt AS StudentUpdatedAt,
+                sg.GroupID, sg.GroupName, sg.AcademicYear, sg.IsActive AS GroupIsActive
+            FROM Students s
+            JOIN Institutions i ON s.InstitutionID = i.InstitutionID -- Join para filtro de distrito/institución
+            LEFT JOIN StudentGroupMembers sgm ON s.StudentID = sgm.StudentID
+            LEFT JOIN StudentGroups sg ON sgm.GroupID = sg.GroupID
+            ${queryConditions}
+            ORDER BY s.LastName ASC, s.FirstName ASC
+            -- Añadir LIMIT y OFFSET aquí si se implementa paginación
+        `;
+
+        const [studentsWithGroups] = await db.query(query, queryParams);
+
+        // 3. Formatear la respuesta (opcional: datos del grupo anidados dentro del estudiante)
+        // La consulta actual devuelve una estructura plana. Se podría procesar más
+        // si se necesita una estructura anidada como { student: {...}, group: {...} } por entrada.
+        // Por simplicidad, devolver la estructura plana suele ser suficiente.
+
+        // 4. Respuesta exitosa
+        res.status(200).json({ students: studentsWithGroups });
+
+    } catch (error) {
+        console.error('Error al obtener estudiantes con grupos:', error);
+        next(error);
+    }
+};

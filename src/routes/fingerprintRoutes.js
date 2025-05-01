@@ -8,7 +8,7 @@ const router = express.Router();
 router.post(
     '/',
     protect,
-    authorize('AdminInstitucion'), // Solo AdminInstitucion puede registrar huellas
+    authorize('AdminInstitucion', 'Profesor', 'PersonalApoyo'), // Solo AdminInstitucion puede registrar huellas
     biometricController.createOrUpdateTemplate
 );
 
