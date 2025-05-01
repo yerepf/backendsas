@@ -94,7 +94,7 @@ exports.getAllInstitutions = async (req, res, next) => {
             SELECT 
                 i.InstitutionID, 
                 i.Name, 
-                d.Regional-District_Code AS RegionalDistrictCode, 
+                d.\`Regional-District_Code\` AS RegionalDistrictCode, 
                 i.Address, 
                 i.SubscriptionStatus 
             FROM Institutions i
@@ -112,7 +112,7 @@ exports.getAllInstitutions = async (req, res, next) => {
                 SELECT 
                     i.InstitutionID, 
                     i.Name, 
-                    d.Regional-District_Code AS RegionalDistrictCode, 
+                    d.\`Regional-District_Code\` AS RegionalDistrictCode, 
                     i.Address, 
                     i.SubscriptionStatus 
                 FROM Institutions i
