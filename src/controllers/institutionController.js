@@ -90,21 +90,39 @@ exports.getAllInstitutions = async (req, res, next) => {
     let institutions = [];
 
     try {
-        let query = 'SELECT InstitutionID, Name, DistrictID, Address, SubscriptionStatus FROM Institutions';
+        let query = `
+            SELECT 
+                i.InstitutionID, 
+                i.Name, 
+                d.Regional-District_Code AS RegionalDistrictCode, 
+                i.Address, 
+                i.SubscriptionStatus 
+            FROM Institutions i
+            JOIN Districts d ON i.DistrictID = d.DistrictID
+        `;
         const queryParams = [];
 
         // Filter by District if user is AdminDistrito
         if (user.roleName === 'AdminDistrito' && user.districtId) {
-            query += ' WHERE DistrictID = ?';
+            query += ' WHERE i.DistrictID = ?';
             queryParams.push(user.districtId);
         }
 
         // AdminApp puede ver todas las instituciones
         if (user.roleName === 'AdminApp') {
-            query = 'SELECT InstitutionID, Name, DistrictID, Address, SubscriptionStatus FROM Institutions';
+            query = `
+                SELECT 
+                    i.InstitutionID, 
+                    i.Name, 
+                    d.Regional-District_Code AS RegionalDistrictCode, 
+                    i.Address, 
+                    i.SubscriptionStatus 
+                FROM Institutions i
+                JOIN Districts d ON i.DistrictID = d.DistrictID
+            `;
         }
 
-        query += ' ORDER BY Name ASC';
+        query += ' ORDER BY i.Name ASC';
 
         [institutions] = await db.query(query, queryParams);
 
